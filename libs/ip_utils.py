@@ -32,31 +32,10 @@ def cumulated_histogram(histogram):
         cumulated_histogram[i] = cumulated_histogram[i-1] + histogram[i]
     return cumulated_histogram / np.max(cumulated_histogram) * 256
 
-# Calculate 
-def 
-
-#min_index = 0
-#min_val = hist_cumule[0]
-#max_index = 0
-#max_val = hist_cumule[0]
-#for i in range(hist_cumule.size):
-#    if hist_cumule[i] == min_val:
-#        min_index = i
-#    print(hist_cumule[i], max_val)
-#    if hist_cumule[i] != max_val:
-#        max_index = i
-#        max_val = hist_cumule[i]
-#
-#print(min_index)
-#print(max_index)
-#
-#
-## Image finale
-#plt.imshow(ng_mat, cmap='gray')
-#plt.show()
-#for i in range(ng_mat.shape[0]):
-#    for j in range(ng_mat.shape[1]):
-#        ng_mat[i, j] = hist_cumule[ng_mat[i, j]]
-#
-#plt.imshow(ng_mat, cmap='gray')
-#plt.show()
+# Calculate new image matrix
+def egalized_matrix(matrix, cumulated_histogram):
+    new_matrix = matrix
+    for i in range(new_matrix.shape[0]):
+        for j in range(new_matrix.shape[1]):
+            new_matrix[i, j] = cumulated_histogram[new_matrix[i, j]]
+    return new_matrix

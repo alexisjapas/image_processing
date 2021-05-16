@@ -17,8 +17,8 @@ matrix = cv.imread("data/lenna.png")
 
 # Let's move to gray scale
 matrix_gray = ip.color_to_gray(matrix)
-print(matrix_gray.size)
 plt.imshow(matrix_gray, cmap='gray')
+print("Gray image:")
 plt.show()
 
 # Calculate it's histogram
@@ -28,6 +28,22 @@ plt.plot(h)
 # Calculate cumulated histogram
 ch = ip.cumulated_histogram(h)
 plt.plot(ch)
+print("Gray image histogram & cumulated histogram:")
 plt.show()
 
-#cv.imwrite("test_enregistrement.png", matG2)
+# Calculate an image from normalized cumulated histogram
+egalized_matrix = ip.egalized_matrix(matrix_gray, ch)
+plt.imshow(egalized_matrix, cmap='gray')
+print("Egalized image:")
+plt.show()
+
+# Calculate egalized image histogram
+eh = ip.histogram(egalized_matrix)
+plt.plot(eh)
+ech = ip.cumulated_histogram(eh)
+plt.plot(ech)
+print("Egalized image histogram:")
+plt.show()
+
+# Save the image as png
+#cv.imwrite("test_egalized_matrix.png", egalized_matrix)
