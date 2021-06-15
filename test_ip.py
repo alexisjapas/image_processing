@@ -13,7 +13,7 @@ import libs.ip_utils as ip
 
 
 # Colored matrix
-matrix = cv.imread("data/lenna.png")
+matrix = cv.imread("data/kolibri.jpg")
 
 # Let's move to gray scale
 matrix_gray = ip.color_to_gray(matrix)

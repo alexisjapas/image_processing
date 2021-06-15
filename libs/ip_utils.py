@@ -38,7 +38,7 @@ def cumulated_histogram(hist):
 
 # Calculate new image matrix
 def equalized_matrix(matrix, cumulated_hist):
-    new_matrix = matrix
+    new_matrix = matrix.copy()
     for i in range(new_matrix.shape[0]):
         for j in range(new_matrix.shape[1]):
             new_matrix[i, j] = cumulated_hist[new_matrix[i, j]]
@@ -46,7 +46,7 @@ def equalized_matrix(matrix, cumulated_hist):
 
 
 def pixelized_matrix(matrix, kernel_size):
-    new_matrix = matrix
+    new_matrix = matrix.copy()
     for i in range(0, matrix.shape[0]-kernel_size+1, kernel_size):
         for j in range(0, matrix.shape[1]-kernel_size+1, kernel_size):
             medium = np.zeros(3)
