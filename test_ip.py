@@ -32,18 +32,18 @@ print("Gray image histogram & cumulated histogram:")
 plt.show()
 
 # Calculate an image from normalized cumulated histogram
-egalized_matrix = ip.egalized_matrix(matrix_gray, ch)
-plt.imshow(egalized_matrix, cmap='gray')
-print("Egalized image:")
+equalized_matrix = ip.equalized_matrix(matrix_gray, ch)
+plt.imshow(equalized_matrix, cmap='gray')
+print("Equalized image:")
 plt.show()
 
-# Calculate egalized image histogram
-eh = ip.histogram(egalized_matrix)
+# Calculate Equalized image histogram
+eh = ip.histogram(equalized_matrix)
 plt.plot(eh)
 ech = ip.cumulated_histogram(eh)
 plt.plot(ech)
-print("Egalized image histogram:")
+print("Equalized image histogram:")
 plt.show()
 
 # Save the image as png
-#cv.imwrite("test_egalized_matrix.png", egalized_matrix)
+# cv.imwrite("test_equalized_matrix.png", equalized_matrix)
