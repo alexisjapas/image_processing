@@ -8,13 +8,12 @@ Created on Sat May 15 13:25:01 2021
 
 import cv2 as cv
 import numpy as np
-import math as m
 
 
 # Convert a color matrix to gray
 def color_to_gray(matrix):
     b, v, r = cv.split(matrix)
-    matrix_gray = 0.299*r + 0.587*v + 0.114*b
+    matrix_gray = 0.299 * r + 0.587 * v + 0.114 * b
     return matrix_gray.astype(np.uint8)
 
 
@@ -39,23 +38,42 @@ def cumulated_histogram(hist):
 # Calculate new image matrix
 def equalized_matrix(matrix, cumulated_hist):
     new_matrix = matrix.copy()
-    for i in range(new_matrix.shape[0]):
-        for j in range(new_matrix.shape[1]):
-            new_matrix[i, j] = cumulated_hist[new_matrix[i, j]]
+    new_matrix = np.array([[cumulated_hist[new_matrix[i, j]] for
+                            j in range(new_matrix.shape[1])] for i in range(new_matrix.shape[0])])
     return new_matrix
 
 
-def pixelized_matrix(matrix, kernel_size):
-    new_matrix = matrix.copy()
-    for i in range(0, matrix.shape[0]-kernel_size+1, kernel_size):
-        for j in range(0, matrix.shape[1]-kernel_size+1, kernel_size):
-            medium = np.zeros(3)
-            for k in range(kernel_size):
-                for n in range(kernel_size):
-                    medium += matrix[i+k][j+n]
-            medium /= int(m.pow(kernel_size, 2))
-            for k in range(kernel_size):
-                for n in range(kernel_size):
-                    new_matrix[i+k][j+n] = medium
+def pixelized_matrix(matrix, nb_vertical_pixel, nb_horizontal_pixel):
+    new_matrix = np.zeros_like(matrix)
+
+    height = new_matrix.shape[0]
+    width = new_matrix.shape[1]
+
+    pixel_height = height / nb_vertical_pixel
+    pixel_width = width / nb_horizontal_pixel
+
+    # Scalar if shades of gray and array if multi-channel
+    channels = 1 if len(new_matrix.shape) == 2 else new_matrix.shape[2]
+    print(channels)
+
+    # Pixelize entire squares
+    if channels == 1:
+        for i in range(nb_vertical_pixel):
+            for j in range(nb_horizontal_pixel):
+                start_i = int(i * pixel_height)
+                end_i = int((i + 1) * pixel_height)
+                start_j = int(j * pixel_width)
+                end_j = int((j + 1) * pixel_width)
+                new_matrix[start_i:end_i, start_j:end_j] = np.mean(matrix[start_i:end_i, start_j:end_j])
+    else:
+        for i in range(nb_vertical_pixel):
+            for j in range(nb_horizontal_pixel):
+                start_i = int(i * pixel_height)
+                end_i = int((i + 1) * pixel_height)
+                start_j = int(j * pixel_width)
+                end_j = int((j + 1) * pixel_width)
+                for c in range(channels):
+                    new_matrix[start_i:end_i, start_j:end_j, c] = np.mean(
+                        matrix[start_i:end_i, start_j:end_j, c])
 
     return new_matrix
