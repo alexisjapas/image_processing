@@ -8,5 +8,5 @@ matrix = cv2.imread('data/kolibri.jpg')
 
 pixel = ip.pixelized_matrix(matrix, 400, 40)
 plt.figure(1)
-plt.imshow(pixel, cmap='gray')
+plt.imshow(pixel)
 plt.show()

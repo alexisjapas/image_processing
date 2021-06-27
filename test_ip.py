@@ -8,6 +8,7 @@ Created on Sun May 16 14:04:07 2021
 
 import matplotlib.pyplot as plt
 import cv2 as cv
+import numpy as np
 
 import libs.ip_utils as ip
 
@@ -16,25 +17,28 @@ import libs.ip_utils as ip
 matrix = cv.imread("data/kolibri.jpg")
 
 # Let's move to gray scale
-matrix_gray = ip.color_to_gray(matrix)
-plt.imshow(matrix_gray, cmap='gray')
-print("Gray image:")
-plt.show()
+# matrix_gray = ip.color_to_gray(matrix)
+# print("Gray image:", matrix_gray.shape)
+# plt.imshow(matrix_gray, cmap='gray')
+# plt.show()
+matrix_gray = matrix
 
 # Calculate it's histogram
 h = ip.histogram(matrix_gray)
+print(np.amax(h))
 plt.plot(h)
+plt.show()
 
 # Calculate cumulated histogram
 ch = ip.cumulated_histogram(h)
-plt.plot(ch)
 print("Gray image histogram & cumulated histogram:")
+plt.plot(ch)
 plt.show()
 
 # Calculate an image from normalized cumulated histogram
-equalized_matrix = ip.equalized_matrix(matrix_gray, ch)
+equalized_matrix = ip.equalized_matrix(matrix_gray)
+print("Equalized image:", equalized_matrix.shape)
 plt.imshow(equalized_matrix, cmap='gray')
-print("Equalized image:")
 plt.show()
 
 # Calculate Equalized image histogram
