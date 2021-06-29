@@ -24,27 +24,27 @@ matrix = cv.imread("data/kolibri.jpg")
 matrix_gray = matrix
 
 # Calculate it's histogram
-h = ip.histogram(matrix_gray)
+h = ip.histogram(matrix_gray, 8)
 print(np.amax(h))
 plt.plot(h)
 plt.show()
 
 # Calculate cumulated histogram
-ch = ip.cumulated_histogram(h)
+ch = ip.cumulated_histogram(matrix_gray, 8)
 print("Gray image histogram & cumulated histogram:")
 plt.plot(ch)
 plt.show()
 
 # Calculate an image from normalized cumulated histogram
-equalized_matrix = ip.equalized_matrix(matrix_gray)
+equalized_matrix = ip.equalized_matrix(matrix_gray, 8)
 print("Equalized image:", equalized_matrix.shape)
 plt.imshow(equalized_matrix, cmap='gray')
 plt.show()
 
 # Calculate Equalized image histogram
-eh = ip.histogram(equalized_matrix)
+eh = ip.histogram(equalized_matrix, 8)
 plt.plot(eh)
-ech = ip.cumulated_histogram(eh)
+ech = ip.cumulated_histogram(equalized_matrix, 8)
 plt.plot(ech)
 print("Equalized image histogram:")
 plt.show()
