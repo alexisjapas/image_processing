@@ -7,6 +7,7 @@ Created on Sat May 15 13:25:01 2021
 """
 
 import cv2 as cv
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -18,20 +19,30 @@ def color_to_gray(matrix, nbits):
     return matrix_gray.astype(f'uint{nbits}')
 
 
+def rgb_to_ycbcr(matrix, nbits):
+    b, v, r = cv.split(matrix)
+    y = 0.299 * r + 0.587 * v + 0.114 * b
+    cb = 0.5 * b - 0.1687 * r - 0.3313 * v + 2**(nbits-1)
+    cr = 0.5 * r - 0.4187 * v - 0.0813 * b + 2**(nbits-1)
+
+    return y, cb, cr
+
+
+def ycbcr_to_rgb(y, cb, cr, nbits):
+    matrix = np.zeros((y.shape[0], y.shape[1], 3))
+    matrix[:, :, 0] = y + 1.772 * (cb - 2**(nbits-1))
+    matrix[:, :, 1] = y - 0.34414 * (cb - 2**(nbits-1)) - 0.71414 * (cr - 2**(nbits-1))
+    matrix[:, :, 2] = y + 1.402 * (cr - 2**(nbits-1))
+
+    return matrix.astype(f'uint{nbits}')
+
+
 # Calculate the histogram (normalized)
 def histogram(matrix, nbits):
-    channels = 1 if len(matrix.shape) == 2 else matrix.shape[2]
-    if channels == 1:
-        hist = np.zeros(2**nbits)
-        for i in range(matrix.shape[0]):
-            for j in range(matrix.shape[1]):
-                hist[matrix[i, j]] = hist[matrix[i, j]] + 1
-    else:
-        hist = np.zeros((2**nbits, channels))
-        for i in range(matrix.shape[0]):
-            for j in range(matrix.shape[1]):
-                for c in range(channels):
-                    hist[matrix[i, j, c], c] = hist[matrix[i, j, c], c] + 1
+    hist = np.zeros(2**nbits)
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            hist[int(matrix[i, j])] = hist[int(matrix[i, j])] + 1
 
     return hist / np.max(hist) * (2**nbits - 1)
 
@@ -39,37 +50,27 @@ def histogram(matrix, nbits):
 # Calculate cumulated histogram (normalized)
 def cumulated_histogram(matrix, nbits):
     hist = histogram(matrix, nbits)
-    channels = 1 if len(hist.shape) == 1 else hist.shape[1]
-    if channels == 1:
-        cumulated_hist = np.zeros(2**nbits)
-        cumulated_hist[0] = hist[0]
-        for i in range(1, hist.shape[0]):
-            cumulated_hist[i] = cumulated_hist[i - 1] + hist[i]
-        cumulated_hist /= np.max(cumulated_hist)
-    else:
-        cumulated_hist = np.zeros((2**nbits, hist.shape[1]))
-        cumulated_hist[0] = hist[0]
-        for i in range(1, hist.shape[0]):
-            cumulated_hist[i] = cumulated_hist[i - 1] + hist[i]
-        cumulated_hist /= np.amax(cumulated_hist)
+    cumulated_hist = np.zeros(2**nbits)
+    cumulated_hist[0] = hist[0]
+    for i in range(1, hist.shape[0]):
+        cumulated_hist[i] = cumulated_hist[i - 1] + hist[i]
+    cumulated_hist /= np.max(cumulated_hist)
 
     return cumulated_hist * (2**nbits - 1)
 
 
 def equalized_matrix(matrix, nbits):
     """Equalize entry matrix histogram and return equalized matrix"""
-    cumulated_hist = cumulated_histogram(matrix, nbits)
-
     new_matrix = matrix.copy()
-    channels = 1 if len(matrix.shape) == 2 else matrix.shape[2]
-    if channels == 1:
-        new_matrix = np.array([[cumulated_hist[new_matrix[i, j]] for
+
+    if len(matrix.shape) == 2:
+        cumulated_hist = cumulated_histogram(matrix, nbits)
+        new_matrix = np.array([[cumulated_hist[int(new_matrix[i, j])] for
                                 j in range(new_matrix.shape[1])] for i in range(new_matrix.shape[0])])
     else:
-        for i in range(new_matrix.shape[0]):
-            for j in range(new_matrix.shape[1]):
-                for c in range(channels):
-                    new_matrix[i, j, c] = cumulated_hist[new_matrix[i, j, c], c]
+        y, cb, cr = rgb_to_ycbcr(matrix, nbits)
+        ey = equalized_matrix(y, nbits)
+        new_matrix = ycbcr_to_rgb(ey, cb, cr, nbits)
 
     return new_matrix.astype(f'uint{nbits}')
 
